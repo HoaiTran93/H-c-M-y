@@ -30,7 +30,8 @@ class ID3(object):
             else:
                 self._set_label(node)
         
-        return self.root
+        self.print_tree(self.root)
+        #return self.root
         
     def cal_entropy(self, index):
         if index == 0:
@@ -48,6 +49,7 @@ class ID3(object):
         index = node.index
         best_gain = 0
         best_splits = []
+        best_order_splits = []
         best_attributes = None
         element = None
         sub_data = self.data.iloc[index, :]
@@ -56,9 +58,11 @@ class ID3(object):
             if len(values) == 1: #entropy = 0
                 continue
             splits = []
+            order_splits = []
             for val in values:
                 sub_index = sub_data.index[sub_data[attr] == val].tolist()
                 splits.append([sub_id-1 for sub_id in sub_index])
+                order_splits.append(val)
             # don't split if a node has too small number of points
             if min(map(len, splits)) < self.min_branch: 
                 continue
@@ -73,10 +77,12 @@ class ID3(object):
                 best_gain = gain
                 best_splits = splits
                 best_attributes = attr
+                best_order_splits = order_splits
                 element = values
         node.set_properties(best_attributes, element)
-        child_nodes = [NodeTree(index = split,
-                     entropy = self.cal_entropy(split), high = node.high + 1) for split in best_splits]
+        child_nodes = [NodeTree(index = split, order_split_attribute = order_split
+                       ,entropy = self.cal_entropy(split), high = node.high + 1) 
+                                                        for split, order_split in zip(best_splits, best_order_splits)]
         return child_nodes
     
     def _set_label(self, node):
@@ -96,9 +102,13 @@ class ID3(object):
             
         return labels
     
-    def print_tree(self, node_queue):
-        while node_queue:
-            node = node_queue.pop()
-            print(node.split_attribute)
-            print(node.element)
-            print(node.label)
+    def print_tree(self, node,  file=None, _prefix="", _last=True):
+        print(_prefix, "`- " if _last else "|- ", '(',node.order_split_attribute, ')',
+              node.split_attribute if node.split_attribute != None else node.label, sep="", file=file)
+        _prefix += "   " if _last else "|  "
+        child_count = len(node.children)
+        for i, child in enumerate(node.children):
+            _last = i == (child_count - 1)
+            self.print_tree(child, file, _prefix, _last)
+            
+                
