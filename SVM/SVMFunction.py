@@ -57,7 +57,16 @@ class PrimalSVM():
         heightPoint = t*(np.sum((Xtmp*self.w.T),axis = 1)).reshape(-1,1)
         print("range of Points=\n",rangePoint)
         print("height of Points=\n",heightPoint)
-
+    
+    def predict_label(self, Xpredict):
+        Xtmp = self.add_column_one(Xpredict)
+        ypredict = np.sum((Xtmp*self.w.T),axis = 1).reshape(-1,1)
+        for i in range(len(ypredict)):
+            if (ypredict[i] > 0):
+                ypredict[i] = 1
+            else:
+                ypredict[i] = -1
+        return ypredict
 ##########################################################################################    
         
 class dualSVM():

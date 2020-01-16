@@ -67,13 +67,15 @@ class Classification():
         return np.heaviside(prediction - 0.5, 0.0)
     
     def predictNclass(self, Xpred, t = None):
-        prediction = self.predictLabel(Xpred)
+        prediction = self.predictLabel(Xpred, reshape = True)
         if t is not None:
-            print("MSE = ",format(self.mse(t, self.sigmoid(Xpred.dot(self.w)))))
+            print("MSE = ",format(self.mse(t, prediction)))
+            #print("MSE = ",format(self.mse(t, self.sigmoid(Xpred.dot(self.w)))))
+            
         lbl = []
         for i in range(len(prediction)):
             tmp = np.zeros(self.NumClass, dtype = float)
-            tmp[prediction[i]] = 1.0
+            tmp[int(prediction[i])] = 1.0
             lbl.append(tmp)
         return np.array(lbl) 
 

@@ -121,3 +121,4 @@ class plotSVM():
         plt.legend()
         plt.show()
         return self
+        

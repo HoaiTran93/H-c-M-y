@@ -134,9 +134,17 @@ class KernelSVM():
         yPredict = Kbs.dot(As) + self.b*np.ones(len(Xb)).reshape(-1, 1)
         return yPredict    
     
+    def predict_label(self, Xpre):
+        ypredict = self.predict(Xpre)
+        for i in range(len(ypredict)):
+            if (ypredict[i] > 0):
+                ypredict[i] = 1
+            else:
+                ypredict[i] = -1
+        return ypredict
+    
     def _predict(self, Xpredict):
         ypredict = self.predict(Xpredict)
-        
         for i in range(len(ypredict)):
             num = np.asscalar(ypredict[i])
             if (num > -1.0001 and num < -0.9999) or (num < 1.0001 and num > 0.9999):
